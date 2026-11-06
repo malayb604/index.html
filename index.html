@@ -1,0 +1,368 @@
+Msdb
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lottery 7 — মোবাইল সংস্করণ</title>
+<style>
+:root{
+  --theme:#12c94a;--theme-rgb:18,201,74;
+  --ink:#101820;--muted:#64748b;--paper:#f3f6fb;--card:#fff;
+  --blue:#1264d8;--green:#159447;--red:#c82333;
+}
+*{box-sizing:border-box}
+body{font-family:Arial,"Noto Sans Bengali",sans-serif;background:linear-gradient(180deg,#eaf0f8,#f7f9fc 38%,#e9eef5);padding:12px;margin:0;color:var(--ink)}
+.container{max-width:620px;background:transparent;padding:0;margin:auto;box-shadow:none}
+.topline{
+  display:flex;justify-content:space-between;align-items:center;gap:10px;
+  padding:15px 16px;margin-bottom:14px;border-radius:18px;color:#fff;
+  background:linear-gradient(115deg,#07140e,#101b22 70%,#06140c);
+  border:1px solid rgba(var(--theme-rgb),.75);
+  box-shadow:0 5px 18px rgba(0,0,0,.18),inset 0 0 18px rgba(var(--theme-rgb),.13);
+}
+h2{font-size:23px;margin:0;font-weight:900;letter-spacing:.3px}
+.save-state{font-size:11px;color:#d9ffe4;background:#123c25;border:1px solid rgba(var(--theme-rgb),.65);padding:7px 10px;border-radius:30px;white-space:nowrap}
+.sem-container{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:7px;margin-bottom:12px}
+.sem-btn{min-width:0;min-height:58px;border-radius:15px;border:2px solid #1765d4;background:#fff;color:#1557b7;font-weight:900;font-size:19px;cursor:pointer;box-shadow:0 2px 5px #0b2a5010}
+.sem-btn small{font-size:11px}
+.sem-btn.active{background:linear-gradient(145deg,#176be5,#0647b5);color:white;box-shadow:0 5px 12px #176be544}
+.setting-bar{display:flex;justify-content:space-between;align-items:center;gap:10px;background:#e5eaf1;padding:12px 14px;border:1px solid #cbd5e1;border-radius:14px;margin-bottom:12px;font-size:14px}
+.setting-bar input{width:20px;height:20px;accent-color:var(--theme)}
+.input-row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.input-box{display:flex;align-items:center;gap:5px;flex:1;min-width:0}
+.input-box label{font-weight:900;font-size:12px;color:#344256}
+.input-box input{width:100%;min-width:0;padding:12px 6px;text-align:center;border:1px solid #b8c4d3;border-radius:10px;font-size:16px;background:#fff;outline:none}
+.input-box input:focus{border-color:var(--theme);box-shadow:0 0 0 3px rgba(var(--theme-rgb),.13)}
+.btn-add{width:48px;height:46px;background:linear-gradient(145deg,#20b95b,#087a36);color:white;border:0;border-radius:11px;font-size:25px;font-weight:bold;box-shadow:0 3px 8px #087a3633}
+.hint{font-size:11px;color:#64748b;text-align:center;margin:8px 0 12px}
+#captureArea{background:#fff;padding:12px;border:1px solid #d5deea;border-radius:18px;box-shadow:0 5px 18px rgba(15,23,42,.08)}
+.report-header{
+  --theme:#12c94a;--theme-rgb:18,201,74;
+  width:100%;min-height:170px;margin:0 auto 14px;padding:18px 14px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;
+  position:relative;overflow:hidden;border:2px solid var(--theme);border-radius:19px;
+  background:radial-gradient(ellipse at 50% 0%,rgba(var(--theme-rgb),.17),transparent 65%),linear-gradient(145deg,#020b07,#06150d 55%,#020907);
+  box-shadow:inset 0 0 0 5px rgba(var(--theme-rgb),.08),inset 0 0 22px rgba(var(--theme-rgb),.12),0 5px 14px rgba(var(--theme-rgb),.16);
+  transition:border-color .3s,box-shadow .3s;
+}
+.report-header:before{content:"";position:absolute;inset:7px;border:1px solid rgba(var(--theme-rgb),.25);border-radius:12px;pointer-events:none}
+.report-header:after{content:"";position:absolute;left:12%;right:12%;top:50%;height:1px;background:linear-gradient(90deg,transparent,rgba(var(--theme-rgb),.7),transparent);box-shadow:0 0 8px rgba(var(--theme-rgb),.55)}
+.report-header .date-text{order:0;width:auto;height:auto;padding:0;display:block;text-align:center;border:0;background:none;box-shadow:none;color:var(--theme);font-size:clamp(29px,8vw,48px);font-weight:900;line-height:1.1;letter-spacing:1px;text-shadow:0 0 10px rgba(var(--theme-rgb),.55)}
+.report-header .time-circle{order:1;width:auto;height:auto;padding:0;display:flex;align-items:center;justify-content:center;gap:8px;border:0;background:none;box-shadow:none;color:var(--theme);font-size:clamp(36px,9vw,57px);font-weight:900;text-shadow:0 0 10px rgba(var(--theme-rgb),.55)}
+.time-hour,.time-period{font-size:inherit;font-weight:900;line-height:1;letter-spacing:-1px}
+table{width:100%;border-collapse:separate;border-spacing:0;margin-top:5px;border:2px solid var(--theme);border-radius:12px;overflow:hidden;box-shadow:0 3px 10px rgba(var(--theme-rgb),.10)}
+th,td{border-right:1px solid rgba(var(--theme-rgb),.7);border-bottom:1px solid rgba(var(--theme-rgb),.7);padding:9px 3px;text-align:center}
+th:last-child,td:last-child{border-right:0}
+tbody tr:last-child td{border-bottom:0}
+th{background:linear-gradient(145deg,#073d1e,#087b35);color:#fff;font-size:11px;letter-spacing:.2px}
+td{font-weight:bold;color:#111;background:#fff;font-size:13px}
+.number-cell{font-size:20px;font-weight:1000;letter-spacing:.35px;white-space:nowrap;color:#000}
+.entry-row td:last-child{white-space:nowrap}
+.entry-delete{font-size:10px;color:#a51624;background:#fff0f0;border:1px solid #ffc7cc;border-radius:6px;padding:5px 6px}
+.total-row{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:13px;padding:13px 15px;background:linear-gradient(135deg,#07130c,#101a17);border:2px solid var(--theme);border-radius:14px;color:#fff;font-weight:900;font-size:20px;box-shadow:0 3px 12px rgba(var(--theme-rgb),.13)}
+#totalPieces{font-size:31px;font-weight:1000;color:var(--theme);letter-spacing:.6px;text-shadow:0 0 10px rgba(var(--theme-rgb),.35)}
+button{cursor:pointer}
+.action{width:100%;padding:12px;border:0;border-radius:11px;color:white;font-size:14px;font-weight:bold;margin-top:9px;box-shadow:0 3px 8px #0002}
+.green{background:linear-gradient(145deg,#20b95b,#087a36)}.blue{background:linear-gradient(145deg,#2580ed,#0752bd)}.gray{background:linear-gradient(145deg,#718096,#3c4858)}.red{background:linear-gradient(145deg,#f04444,#b81724)}
+.secondary-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.panel{margin-top:13px;border:1px solid #d4dce7;border-radius:14px;padding:12px;background:#fff;box-shadow:0 3px 12px #0f172a0a}
+.panel h3{font-size:15px;margin:0 0 8px;color:#172334}
+.history-item{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid #e8edf3;font-size:12px}
+.history-item:last-child{border-bottom:0}
+.small-btn{border:0;border-radius:7px;padding:7px 9px;font-weight:bold;color:white}
+.empty{color:#778397;font-size:12px;text-align:center;padding:10px}
+.note{font-size:11px;color:#64748b;line-height:1.5;margin:12px 2px}
+.modal-back{display:none;position:fixed;inset:0;background:#0008;align-items:center;justify-content:center;padding:18px;z-index:10}
+.modal{background:#fff;padding:18px;border-radius:14px;width:100%;max-width:420px}
+.modal input{width:100%;padding:10px;border:1px solid #bbb;border-radius:7px;margin:7px 0}
+@media(max-width:390px){
+ body{padding:8px}.topline{padding:12px}h2{font-size:20px}.save-state{font-size:10px;padding:6px 8px}
+ .sem-container{gap:5px}.sem-btn{min-height:52px;font-size:17px}
+ #captureArea{padding:8px}.report-header{min-height:145px}
+ th,td{padding:8px 2px;font-size:10px}.number-cell{font-size:17px;font-weight:1000;color:#000}
+ .total-row{font-size:17px;padding:11px 12px}#totalPieces{font-size:27px}
+}
+</style>
+</head>
+<body>
+<div class="container">
+ <div class="topline"><h2>Lottery 7</h2><span class="save-state" id="saveState">● Auto Save চালু</span></div>
+<div class="sem-container">
+  <button class="sem-btn active" data-sem="5" onclick="selectSem(5,this)">5<br><small>sem</small></button>
+  <button class="sem-btn" data-sem="10" onclick="selectSem(10,this)">10<br><small>sem</small></button>
+  <button class="sem-btn" data-sem="15" onclick="selectSem(15,this)">15<br><small>sem</small></button>
+  <button class="sem-btn" data-sem="20" onclick="selectSem(20,this)">20<br><small>sem</small></button>
+  <button class="sem-btn" data-sem="30" onclick="selectSem(30,this)">30<br><small>sem</small></button>
+  <button class="sem-btn" data-sem="50" onclick="selectSem(50,this)">50<br><small>sem</small></button>
+ </div>
+ <div class="setting-bar"><b>Single Auto Entry</b><input type="checkbox" id="autoToggle" onchange="saveState()"></div>
+ <div class="input-row">
+  <div class="input-box"><label>FROM</label><input id="startNo" inputmode="numeric" maxlength="5" placeholder="5 digits" oninput="limitInput(this,5);saveState();autoStart()"></div>
+  <div class="input-box"><label>TO</label><input id="endNo" inputmode="numeric" maxlength="2" placeholder="2 digits" oninput="limitInput(this,2);saveState();autoEnd()"></div>
+  <button class="btn-add" onclick="addEntry()">＋</button>
+ </div>
+ <div class="hint">লেখা ও হিসাব স্বয়ংক্রিয়ভাবে সেভ হবে। কোনো এন্ট্রি মুছতে পাশে Delete চাপুন।</div>
+ <div id="captureArea">
+  <div class="report-header"><div class="time-circle" id="displayTime">1 PM</div><div class="date-text" id="displayDate"></div></div>
+  <table id="entryTable">
+   <thead><tr><th style="width:12%">SL</th><th style="width:22%">SEM</th><th style="width:43%">NUMBER</th><th style="width:23%">PIECE</th></tr></thead>
+   <tbody></tbody>
+  </table>
+  <div class="total-row"><span>Total</span><span id="totalPieces">0 P</span></div>
+ </div>
+ <button class="action green" onclick="shareReport()">WhatsApp-এ রিপোর্ট পাঠান</button>
+ <div class="secondary-actions">
+  <button class="action blue" onclick="saveDraft()">Draft সেভ করুন</button>
+  <button class="action gray" onclick="saveHistory()">History-তে সেভ করুন</button>
+  <button class="action gray" onclick="exportBackup()">Backup</button>
+  <button class="action gray" onclick="document.getElementById('importFile').click()">Backup ফিরিয়ে আনুন</button>
+ </div>
+ <input id="importFile" type="file" accept="application/json" hidden onchange="importBackup(event)">
+ <button class="action red" onclick="clearAll()">সব Reset করুন</button>
+ <div class="panel">
+  <h3>Draft / অসমাপ্ত হিসাব</h3>
+  <div id="draftInfo" class="empty">কোনো Draft নেই</div>
+  <button class="small-btn blue" onclick="restoreDraft()">Open Draft</button>
+ </div>
+ <div class="panel">
+  <h3>History / পুরোনো হিসাব</h3>
+  <div id="historyList"><div class="empty">এখনও কোনো হিসাব সেভ করা হয়নি</div></div>
+ </div>
+ <p class="note">অফলাইন সংস্করণ: আপনার হিসাব এই ফোনের ব্রাউজার/অ্যাপের লোকাল স্টোরেজে সেভ হবে। অন্য ফোনে নিজে থেকে Sync হবে না। নিয়মিত Backup রাখুন।</p>
+</div>
+<div class="modal-back" id="confirmModal"><div class="modal">
+ <h3 id="modalTitle">নিশ্চিত করুন</h3><p id="modalText"></p>
+ <div class="secondary-actions"><button class="action gray" onclick="closeModal()">Cancel</button><button class="action red" id="confirmAction">Delete</button></div>
+</div></div>
+<script>
+const STORAGE_KEY='lottery7_smart_state_v2';
+let selectedSemValue=5, entryList=[], historyList=[], draft=null, deleteTarget=null;
+let autoTimer=null;
+function appState(){
+ return {selectedSemValue,entryList,historyList,draft,auto:document.getElementById('autoToggle').checked,
+  startNo:document.getElementById('startNo').value,endNo:document.getElementById('endNo').value,updatedAt:Date.now()};
+}
+function stamp(){return new Date().toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'});}
+function setSaved(){const e=document.getElementById('saveState');e.textContent='● Saved';e.style.color='#218838';}
+function scheduleSave(){document.getElementById('saveState').textContent='Saving…';clearTimeout(autoTimer);autoTimer=setTimeout(saveState,120);}
+function saveState(){
+ const state={selectedSemValue,entryList,historyList,draft,auto:document.getElementById('autoToggle').checked,
+  startNo:document.getElementById('startNo').value,endNo:document.getElementById('endNo').value,updatedAt:Date.now()};
+ try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state));setSaved();}catch(e){document.getElementById('saveState').textContent='Save failed';}
+}
+function loadState(){
+ try{
+  const s=JSON.parse(localStorage.getItem(STORAGE_KEY)||'null');
+  if(s){selectedSemValue=s.selectedSemValue||5;entryList=Array.isArray(s.entryList)?s.entryList:[];
+   historyList=Array.isArray(s.historyList)?s.historyList:[];draft=s.draft||null;
+   document.getElementById('autoToggle').checked=!!s.auto;
+   document.getElementById('startNo').value=s.startNo||'';document.getElementById('endNo').value=s.endNo||'';
+  }
+ }catch(e){}
+ document.querySelectorAll('.sem-btn').forEach(b=>b.classList.toggle('active',Number(b.dataset.sem)===selectedSemValue));
+ updateHeader();renderTable();renderHistory();renderDraft();setSaved();
+}
+function selectSem(v,el){selectedSemValue=v;document.querySelectorAll('.sem-btn').forEach(b=>b.classList.remove('active'));el.classList.add('active');saveState();}
+function limitInput(el,n){el.value=el.value.replace(/\D/g,'').slice(0,n);}
+function autoStart(){
+ const start=document.getElementById('startNo');
+ if(start.value.length!==5)return;
+ if(document.getElementById('autoToggle').checked){addEntry();return;}
+ const next=document.getElementById('endNo');
+ next.focus();
+ try{next.setSelectionRange(next.value.length,next.value.length);}catch(e){}
+}
+function autoEnd(){if(document.getElementById('endNo').value.length===2)addEntry();}
+function addEntry(){
+ const startInput=document.getElementById('startNo').value,endInput=document.getElementById('endNo').value;
+ if(!selectedSemValue){alert('Please select a Sem first!');return;}
+ if(startInput.length!==5){alert('From number must be exactly 5 digits!');document.getElementById('startNo').focus();return;}
+ let startNum=Number(startInput),endNum=startNum,endStr='';
+ if(!document.getElementById('autoToggle').checked && endInput!==''){
+  endStr=startInput.substring(0,3)+endInput;endNum=Number(endStr);
+  if(endNum<startNum){alert('End number cannot be smaller than Start number!');document.getElementById('endNo').focus();return;}
+ }
+ entryList.push({id:crypto.randomUUID?crypto.randomUUID():String(Date.now()+Math.random()),sem:selectedSemValue,start:startInput,end:endStr?endInput:'',pieces:(endNum-startNum+1)*selectedSemValue,createdAt:Date.now()});
+ document.getElementById('startNo').value='';document.getElementById('endNo').value='';
+ renderTable();saveState();document.getElementById('startNo').focus();
+}
+function renderTable(){
+ const body=document.querySelector('#entryTable tbody');body.innerHTML='';let total=0;
+ entryList.forEach((item,i)=>{const tr=body.insertRow();tr.className='entry-row';
+  const number=item.start+(item.end?' to '+item.end:'');
+  [i+1,item.sem+' sem',number,item.pieces+' P'].forEach((v,j)=>{const td=tr.insertCell();td.textContent=v;if(j===2)td.className='number-cell';});
+  const td=tr.insertCell();td.innerHTML='<button class="entry-delete" onclick="deleteEntry('+i+')">Delete</button>';
+  total+=Number(item.pieces)||0;
+ });
+ document.getElementById('totalPieces').textContent=total+' P';
+}
+function deleteEntry(i){if(!confirm('এই এন্ট্রিটি মুছে ফেলবেন?'))return;entryList.splice(i,1);renderTable();saveState();}
+function updateHeader(){
+  const now=new Date(),mins=now.getHours()*60+now.getMinutes();
+  let t='8 PM',c='#ff4545',displayDate=new Date(now);
+  if(mins<780){t='1 PM';c='#12c94a';}
+  else if(mins<1080){t='6 PM';c='#ffd43b';}
+  else if(mins>=1200){
+    displayDate.setDate(displayDate.getDate()+1);t='1 PM';c='#12c94a';
+  }
+  const palettes={
+    green:{hex:'#12c94a',rgb:'18,201,74'},
+    yellow:{hex:'#ffd43b',rgb:'255,212,59'},
+    red:{hex:'#ff4545',rgb:'255,69,69'}
+  };
+  const theme=(c==='#ffd43b')?palettes.yellow:(c==='#ff4545')?palettes.red:palettes.green;
+  document.documentElement.style.setProperty('--theme',theme.hex);
+  document.documentElement.style.setProperty('--theme-rgb',theme.rgb);
+  const header=document.querySelector('.report-header');
+  header.style.setProperty('--theme',theme.hex);
+  header.style.setProperty('--theme-rgb',theme.rgb);
+  const el=document.getElementById('displayTime');const parts=t.split(' ');
+  el.innerHTML='<span class="time-hour">'+parts[0]+'</span><span class="time-period">'+(parts[1]||'PM')+'</span>';
+  document.getElementById('displayDate').textContent=[displayDate.getDate(),displayDate.getMonth()+1,displayDate.getFullYear()].map((x,i)=>i<2?String(x).padStart(2,'0'):x).join('.');
+}
+function saveDraft(){
+ draft={entryList:JSON.parse(JSON.stringify(entryList)),selectedSemValue,startNo:document.getElementById('startNo').value,endNo:document.getElementById('endNo').value,auto:document.getElementById('autoToggle').checked,savedAt:stamp()};
+ saveState();renderDraft();alert('Draft সেভ হয়েছে।');
+}
+function renderDraft(){const el=document.getElementById('draftInfo');el.textContent=draft?('সেভ: '+draft.savedAt+' | এন্ট্রি: '+draft.entryList.length+'টি'):'কোনো Draft নেই';}
+function restoreDraft(){if(!draft){alert('কোনো Draft নেই');return;}entryList=JSON.parse(JSON.stringify(draft.entryList||[]));selectedSemValue=draft.selectedSemValue||5;
+ document.getElementById('startNo').value=draft.startNo||'';document.getElementById('endNo').value=draft.endNo||'';
+ document.getElementById('autoToggle').checked=!!draft.auto;document.querySelectorAll('.sem-btn').forEach(b=>b.classList.toggle('active',Number(b.dataset.sem)===selectedSemValue));
+ renderTable();saveState();alert('Draft ফিরে এসেছে।');}
+function saveHistory(){
+ if(!entryList.length){alert('সেভ করার মতো কোনো এন্ট্রি নেই।');return;}
+ historyList.unshift({id:Date.now(),date:stamp(),entries:JSON.parse(JSON.stringify(entryList)),total:entryList.reduce((a,x)=>a+(Number(x.pieces)||0),0),status:'Saved'});
+ saveState();renderHistory();alert('History-তে সেভ হয়েছে।');
+}
+function renderHistory(){
+ const el=document.getElementById('historyList');el.innerHTML='';
+ if(!historyList.length){el.innerHTML='<div class="empty">এখনও কোনো হিসাব সেভ করা হয়নি</div>';return;}
+ historyList.forEach((h,i)=>{const d=document.createElement('div');d.className='history-item';
+  const left=document.createElement('span');left.textContent=h.date+' · '+h.entries.length+'টি এন্ট্রি · '+h.total+' P';
+  const actions=document.createElement('span');
+  const open=document.createElement('button');open.className='small-btn blue';open.textContent='Open';open.onclick=()=>{entryList=JSON.parse(JSON.stringify(h.entries));renderTable();saveState();};
+  const del=document.createElement('button');del.className='small-btn red';del.textContent='Delete';del.style.marginLeft='5px';del.onclick=()=>{if(confirm('এই History মুছবেন?')){historyList.splice(i,1);saveState();renderHistory();}};
+  actions.append(open,del);d.append(left,actions);el.append(d);
+ });
+}
+function clearAll(){
+ if(!confirm('বর্তমান হিসাব, এন্ট্রি এবং ইনপুট খালি করবেন? History ও Draft থাকবে।'))return;
+ entryList=[];document.getElementById('startNo').value='';document.getElementById('endNo').value='';
+ selectedSemValue=5;document.querySelectorAll('.sem-btn').forEach(b=>b.classList.toggle('active',Number(b.dataset.sem)===5));
+ document.getElementById('autoToggle').checked=false;renderTable();saveState();
+}
+function exportBackup(){
+ const data={app:'Lottery7',version:2,exportedAt:stamp(),state:JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}')};
+ const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');
+ a.href=URL.createObjectURL(blob);a.download='Lottery7-backup.json';a.click();URL.revokeObjectURL(a.href);
+}
+function importBackup(ev){
+ const file=ev.target.files[0];if(!file)return;const r=new FileReader();
+ r.onload=()=>{try{const d=JSON.parse(r.result);if(!d.state||!confirm('বর্তমান ডেটার বদলে ব্যাকআপের ডেটা Restore করবেন?'))return;
+  localStorage.setItem(STORAGE_KEY,JSON.stringify(d.state));loadState();alert('Backup Restore হয়েছে।');
+ }catch(e){alert('Backup ফাইলটি সঠিক নয়।');}};r.readAsText(file);ev.target.value='';
+}
+function roundedRect(ctx,x,y,w,h,r){
+  const rr=Math.min(r,w/2,h/2);
+  ctx.beginPath();ctx.moveTo(x+rr,y);ctx.arcTo(x+w,y,x+w,y+h,rr);
+  ctx.arcTo(x+w,y+h,x,y+h,rr);ctx.arcTo(x,y+h,x,y,rr);ctx.arcTo(x,y,x+w,y,rr);ctx.closePath();
+}
+function canvasText(ctx,text,x,y,font,color,align='left'){
+  ctx.font=font;ctx.fillStyle=color;ctx.textAlign=align;ctx.textBaseline='middle';ctx.fillText(String(text),x,y);
+}
+function makeReportImage(){
+  updateHeader();
+  const date=document.getElementById('displayDate').textContent;
+  const time=document.getElementById('displayTime').textContent;
+  const root=getComputedStyle(document.documentElement);
+  const theme=root.getPropertyValue('--theme').trim()||'#12c94a';
+  const rgb=root.getPropertyValue('--theme-rgb').trim()||'18,201,74';
+  const W=1000,pad=42,inner=W-pad*2;
+  const rowH=76,headH=82,headerH=300,totalH=125;
+  const tableH=headH+Math.max(1,entryList.length)*rowH;
+  const H=pad+headerH+24+tableH+22+totalH+pad;
+  const scale=4,canvas=document.createElement('canvas');
+  canvas.width=W*scale;canvas.height=H*scale;
+  const ctx=canvas.getContext('2d');ctx.scale(scale,scale);
+  const bg=ctx.createLinearGradient(0,0,W,H);bg.addColorStop(0,'#f5f8fc');bg.addColorStop(1,'#e8eef5');
+  ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+  const hx=pad,hy=pad,hw=inner,hh=headerH;
+  roundedRect(ctx,hx,hy,hw,hh,26);ctx.fillStyle='#06130c';ctx.fill();
+  ctx.save();ctx.shadowColor=theme;ctx.shadowBlur=24;ctx.strokeStyle=theme;ctx.lineWidth=4;
+  roundedRect(ctx,hx,hy,hw,hh,26);ctx.stroke();ctx.restore();
+  ctx.strokeStyle='rgba('+rgb+',.35)';ctx.lineWidth=2;roundedRect(ctx,hx+12,hy+12,hw-24,hh-24,18);ctx.stroke();
+  canvasText(ctx,date,W/2,hy+92,'800 64px Arial, sans-serif',theme,'center');
+  ctx.save();ctx.shadowColor=theme;ctx.shadowBlur=13;ctx.strokeStyle=theme;ctx.lineWidth=3;
+  ctx.beginPath();ctx.moveTo(hx+190,hy+151);ctx.lineTo(hx+hw-190,hy+151);ctx.stroke();ctx.restore();
+  canvasText(ctx,time,W/2,hy+224,'900 82px Arial, sans-serif',theme,'center');
+  const tx=pad,ty=hy+hh+24,cols=[.12,.22,.43,.23],labels=['SL','SEM','NUMBER','PIECE'];
+  const widths=cols.map(v=>inner*v);
+  roundedRect(ctx,tx,ty,inner,tableH,14);ctx.save();ctx.clip();
+  ctx.fillStyle='#087b35';ctx.fillRect(tx,ty,inner,headH);
+  ctx.fillStyle='#fff';ctx.font='800 30px Arial, sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+  let xx=tx;
+  labels.forEach((lab,i)=>{ctx.fillText(lab,xx+widths[i]/2,ty+headH/2);xx+=widths[i];});
+  const rows=entryList.length?entryList:[{sem:'—',start:'No entries yet',end:'',pieces:'—'}];
+  rows.forEach((item,i)=>{
+    const y=ty+headH+i*rowH;
+    ctx.fillStyle='#fff';ctx.fillRect(tx,y,inner,rowH);
+    const vals=entryList.length?[i+1,item.sem+' sem',item.start+(item.end?' to '+item.end:''),item.pieces+' P']:['—','—','No entries yet','—'];
+    let x=tx;
+    vals.forEach((v,j)=>{
+      ctx.font=j===2?'900 36px Arial, sans-serif':'800 29px Arial, sans-serif';
+      ctx.fillStyle='#000';ctx.textAlign='center';ctx.textBaseline='middle';
+      let shown=String(v),maxW=widths[j]-14;
+      while(ctx.measureText(shown).width>maxW&&shown.length>4){shown=shown.slice(0,-2)+'…';}
+      ctx.fillText(shown,x+widths[j]/2,y+rowH/2);x+=widths[j];
+    });
+  });
+  ctx.restore();
+  ctx.save();ctx.strokeStyle=theme;ctx.lineWidth=3;roundedRect(ctx,tx,ty,inner,tableH,14);ctx.stroke();
+  ctx.lineWidth=2;let x=tx;
+  for(let i=0;i<widths.length-1;i++){x+=widths[i];ctx.beginPath();ctx.moveTo(x,ty);ctx.lineTo(x,ty+tableH);ctx.stroke();}
+  for(let i=0;i<=rows.length;i++){const y=ty+headH+i*rowH;ctx.beginPath();ctx.moveTo(tx,y);ctx.lineTo(tx+inner,y);ctx.stroke();}
+  ctx.restore();
+  const total=entryList.reduce((a,x)=>a+(Number(x.pieces)||0),0);
+  const by=ty+tableH+22;
+  roundedRect(ctx,pad,by,inner,totalH,20);ctx.fillStyle='#07130c';ctx.fill();
+  ctx.save();ctx.shadowColor=theme;ctx.shadowBlur=14;ctx.strokeStyle=theme;ctx.lineWidth=4;roundedRect(ctx,pad,by,inner,totalH,20);ctx.stroke();ctx.restore();
+  canvasText(ctx,'TOTAL PIECES',pad+inner*.28,by+totalH/2,'800 40px Arial, sans-serif','#fff','center');
+  ctx.strokeStyle='rgba(255,255,255,.65)';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(pad+inner*.53,by+22);ctx.lineTo(pad+inner*.53,by+totalH-22);ctx.stroke();
+  canvasText(ctx,total+' P',pad+inner*.76,by+totalH/2,'900 58px Arial, sans-serif',theme,'center');
+  return new Promise(resolve=>canvas.toBlob(blob=>resolve(blob),'image/png'));
+}
+async function shareReport(){
+  if(!entryList.length){alert('No entries to send!');return;}
+  try{
+    const blob=await makeReportImage();
+    if(!blob)throw new Error('ছবি তৈরি করা যায়নি।');
+    const file=new File([blob],'Lottery7-Report.png',{type:'image/png'});
+    
+    // অ্যাপের লোকাল file:// পরিবেশে সরাসরি শেয়ার ব্লক থাকলে ফলব্যাক হিসেবে ডাউনলোড হবে
+    if(window.location.protocol === 'file:' || !navigator.canShare || !navigator.canShare({files:[file]}) || !navigator.share){
+      const url=URL.createObjectURL(blob),a=document.createElement('a');
+      a.href=url;a.download='Lottery7-Report.png';document.body.appendChild(a);a.click();a.remove();
+      setTimeout(()=>URL.revokeObjectURL(url),1500);
+      alert('এই অ্যাপে সরাসরি Share অপশনটি সমর্থিত নয়। রিপোর্টের PNG ছবি ডাউনলোড হয়েছে; Gallery থেকে Share করুন।');
+      return;
+    }
+    await navigator.share({files:[file]});
+  }catch(e){
+    if(e.name!=='AbortError'){
+      const url=URL.createObjectURL(await makeReportImage()),a=document.createElement('a');
+      a.href=url;a.download='Lottery7-Report.png';document.body.appendChild(a);a.click();a.remove();
+      setTimeout(()=>URL.revokeObjectURL(url),1500);
+      alert('রিপোর্টটি গ্যালারিতে ডাউনলোড হয়েছে। অনুগ্রহ করে Gallery থেকে WhatsApp-এ শেয়ার করুন।');
+    }
+  }
+}
+function closeModal(){document.getElementById('confirmModal').style.display='none';}
+window.addEventListener('beforeunload',saveState);
+window.addEventListener('pagehide',saveState);
+document.addEventListener('visibilitychange',()=>{if(document.hidden)saveState();});
+loadState();updateHeader();
+setInterval(updateHeader,30000);
+</script>
+</body>
+</html>
